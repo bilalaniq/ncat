@@ -1,4 +1,4 @@
-// PixelBackground.tsx
+// src/components/PixelBackground.tsx
 import React, { useEffect, useRef, useState } from 'react';
 
 interface PixelBackgroundProps {
@@ -121,15 +121,17 @@ export const PixelBackground: React.FC<PixelBackgroundProps> = ({
       document.head.appendChild(styleEl);
     }
 
+    // Type assertion for CSS.paintWorklet
     const supported = 'paintWorklet' in CSS;
     setIsSupported(supported);
 
     if (supported && !workletAddedRef.current) {
       const blob = new Blob([workletCode], { type: 'application/javascript' });
       const url = URL.createObjectURL(blob);
-      CSS.paintWorklet
+      // Cast CSS to any to avoid TypeScript error
+      (CSS as any).paintWorklet
         .addModule(url)
-        .catch((err) => {
+        .catch((err: unknown) => {
           console.warn('Failed to load pixel-paint worklet:', err);
           setIsSupported(false);
         })
