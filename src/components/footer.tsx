@@ -44,19 +44,21 @@ const Footer: React.FC = () => {
   return (
     <section
       id="footer"
-      className="relative z-20 bg-black text-white overflow-hidden pt-16 md:pt-24 min-h-[70vh] md:min-h-[60vh] lg:min-h-[50vh]"
+      className="relative z-20 bg-black text-white overflow-hidden flex flex-col justify-end"
+      style={{ minHeight: '70vh' }}
     >
-      {/* SVG Container (absolute positioned at bottom) */}
-      <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none">
+      {/* SVG Container – now part of flex flow, not absolute */}
+      <div className="w-full pointer-events-none mt-auto">
         <svg
           width="100%"
           height="auto"
-          viewBox="0 0 78 19"
+          viewBox="0 0 78 30"               // increased height from 19 to 30
           xmlns="http://www.w3.org/2000/svg"
-          className="w-full"
+          className="w-full block"
           preserveAspectRatio="xMidYMid meet"
+          style={{ minHeight: '120px' }}    // ensures visibility on tiny screens
         >
-          <g transform="matrix(1 0 0 -0.519 0 19)">
+          <g transform="matrix(1 0 0 -0.519 0 30)">  {/* adjusted translate Y from 19 to 30 */}
             <path
               className="footer-svg-paths"
               fill="white"

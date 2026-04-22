@@ -113,7 +113,7 @@ const Slider: React.FC<SliderProps> = ({
               className="item"
               style={{ '--position': index + 1 } as React.CSSProperties}
             >
-              <img src={src} alt={`logo ${index + 1}`} />
+              <img src={src} alt={`logo ${index + 1}`} loading="lazy" />
             </div>
           ))}
         </div>

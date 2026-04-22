@@ -286,6 +286,7 @@ const GallerySection: React.FC<GallerySectionProps> = ({
                   src={getImageSrc(item.src)}
                   alt={item.name}
                   ref={(el) => addImageRef(el, index)}
+                  loading="lazy"
                 />
               </div>
               <div className="item-name">{item.name}</div>

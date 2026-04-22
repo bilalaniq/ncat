@@ -1,4 +1,3 @@
-// src/pages/Home.tsx
 import { lazy, Suspense } from "react";
 import HeroSection from "@/components/hero-section";
 import Footer from "@/components/footer";
@@ -7,7 +6,7 @@ import Slider from "@/components/Slider";
 import GallerySection1 from "@/components/ImageGrid1";
 import GallerySection2 from "@/components/ImageGrid2";
 import StaircaseHoverList from "@/components/StaircaseHoverList";
-
+import TeamMembers from "@/components/TeamMembers";  // 👈 Import the team component
 
 const ParticleField = lazy(() => import("@/components/ParticleField"));
 
@@ -197,6 +196,17 @@ const Home = () => {
         {/* Enhanced Staircase Hover List for Agenda */}
         <div className="max-w-5xl mx-auto px-4 mb-20">
           <StaircaseHoverList items={agendaItems} title="" />
+        </div>
+
+        <div className="text-center mb-10 mt-70">
+          <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
+            Organizing Team
+          </h2>
+        </div>
+
+        {/* 👇 Team Members component inserted here */}
+        <div className="max-w-6xl mx-auto px-4">
+          <TeamMembers />
         </div>
 
         {/* CTA Section */}
