@@ -1,5 +1,5 @@
 // src/components/StaircaseHoverList.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export interface AgendaItem {
   time: string;
@@ -12,14 +12,57 @@ export interface StaircaseHoverListProps {
   items: AgendaItem[];
   title?: string;
   showNotice?: boolean;
+  /** Disable the scaling hover effect entirely on touch devices (default: false) */
+  disableHoverOnTouch?: boolean;
 }
 
 const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
   items,
   title = '',
   showNotice = false,
+  disableHoverOnTouch = false,
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Detect touch capability on mount
+  useEffect(() => {
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  }, []);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    };
+  }, []);
+
+  const handleMouseEnter = (index: number) => {
+    if (disableHoverOnTouch && isTouchDevice) return;
+    setHoveredIndex(index);
+  };
+
+  const handleMouseLeave = () => {
+    if (disableHoverOnTouch && isTouchDevice) return;
+    setHoveredIndex(null);
+  };
+
+  const handleTouchStart = (index: number) => {
+    if (disableHoverOnTouch && isTouchDevice) return;
+    // Clear any pending reset
+    if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+    setHoveredIndex(index);
+  };
+
+  const handleTouchEnd = () => {
+    if (disableHoverOnTouch && isTouchDevice) return;
+    // Reset after a short delay to allow the user to see the effect,
+    // but not interfere with scrolling or link tapping
+    resetTimeoutRef.current = setTimeout(() => {
+      setHoveredIndex(null);
+    }, 150);
+  };
 
   const getScale = (index: number): number => {
     if (hoveredIndex === null) return 1;
@@ -44,6 +87,7 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           font-family: 'Plus Jakarta Sans', sans-serif;
           max-width: 800px;
           margin: 0 auto;
+          padding: 0 1rem; /* Added padding for mobile */
         }
         .agenda-staircase-container h2 {
           margin: 0 0 1.5rem 0;
@@ -83,9 +127,10 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
           position: relative;
           border-radius: 8px;
-          /* Bold left accent bar – separate from card content */
           border-left: 10px solid #f0abfc;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          cursor: pointer; /* Indicate tappable on mobile */
+          -webkit-tap-highlight-color: transparent; /* Remove default tap highlight */
         }
         .agenda-card:hover {
           border-left-color: #e879f9;
@@ -95,7 +140,6 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           align-items: stretch;
           min-height: 100px;
         }
-        /* Time column – visually separated */
         .agenda-time {
           width: 140px;
           padding: 1.2rem 1rem;
@@ -108,10 +152,7 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           display: flex;
           align-items: center;
           justify-content: flex-start;
-          border-top-left-radius: 0;
-          border-bottom-left-radius: 0;
         }
-        /* Content column */
         .agenda-content {
           flex: 1;
           padding: 1.2rem 1.5rem;
@@ -137,7 +178,6 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           color: inherit;
           display: block;
         }
-        /* Hover effects */
         .agenda-card:hover {
           z-index: 5;
           box-shadow: 0 0 25px rgba(240, 171, 252, 0.4);
@@ -145,8 +185,12 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
         .agenda-card:hover .agenda-time {
           color: #e879f9;
         }
-        /* Responsive */
+
+        /* Mobile optimizations */
         @media (max-width: 640px) {
+          .agenda-staircase-container h2 {
+            font-size: 1.75rem;
+          }
           .agenda-card-inner {
             flex-direction: column;
           }
@@ -161,6 +205,17 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
           }
           .agenda-title {
             font-size: 1.1rem;
+          }
+        }
+
+        /* Optional: disable scaling on very small screens to prevent layout issues */
+        @media (max-width: 480px) {
+          .agenda-card {
+            transform: none !important;
+            transition: box-shadow 0.2s ease;
+          }
+          .agenda-card:active {
+            box-shadow: 0 0 15px rgba(240, 171, 252, 0.4);
           }
         }
       `}</style>
@@ -183,8 +238,11 @@ const StaircaseHoverList: React.FC<StaircaseHoverListProps> = ({
             <li
               key={idx}
               className="agenda-card"
-              onMouseEnter={() => setHoveredIndex(idx)}
-              onMouseLeave={() => setHoveredIndex(null)}
+              onMouseEnter={() => handleMouseEnter(idx)}
+              onMouseLeave={handleMouseLeave}
+              onTouchStart={() => handleTouchStart(idx)}
+              onTouchEnd={handleTouchEnd}
+              onTouchCancel={handleTouchEnd}
               style={{
                 transform: `scale(${getScale(idx)})`,
                 transitionDelay: getTransitionDelay(idx),
