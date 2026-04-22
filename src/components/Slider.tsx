@@ -45,7 +45,7 @@ const Slider: React.FC<SliderProps> = ({
           display: flex;
           width: 100%;
           min-width: calc(var(--width) * var(--quantity));
-          position: relative;  /* FIXED: absolute children need relative parent */
+          position: relative;
         }
         .slider .list .item {
           width: var(--width);
@@ -61,6 +61,7 @@ const Slider: React.FC<SliderProps> = ({
           height: 100%;
           object-fit: contain;
         }
+
         @keyframes autoRun {
           from {
             left: 100%;
@@ -69,7 +70,7 @@ const Slider: React.FC<SliderProps> = ({
             left: calc(var(--width) * -1);
           }
         }
-        /* Reverse animation */
+
         @keyframes reversePlay {
           from {
             left: calc(var(--width) * -1);
@@ -78,16 +79,20 @@ const Slider: React.FC<SliderProps> = ({
             left: 100%;
           }
         }
-        /* Apply reverse class styling */
+
         .slider.reverse .list .item {
           animation: reversePlay 10s linear infinite;
         }
-        .slider:hover .item {
-          animation-play-state: paused !important;
-          filter: grayscale(1);
-        }
-        .slider .item:hover {
-          filter: grayscale(0);
+
+        /* Hover effects – ONLY on devices that support hover (mouse) */
+        @media (hover: hover) {
+          .slider:hover .item {
+            animation-play-state: paused !important;
+            filter: grayscale(1);
+          }
+          .slider .item:hover {
+            filter: grayscale(0);
+          }
         }
       `}</style>
 

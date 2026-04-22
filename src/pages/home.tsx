@@ -8,6 +8,7 @@ import GallerySection1 from "@/components/ImageGrid1";
 import GallerySection2 from "@/components/ImageGrid2";
 import StaircaseHoverList from "@/components/StaircaseHoverList";
 
+
 const ParticleField = lazy(() => import("@/components/ParticleField"));
 
 const Home = () => {

@@ -156,8 +156,8 @@ const ParticleField: React.FC = () => {
     camera.position.set(0, 0, 0);
     cameraRef.current = camera;
 
-    // Create geometry with 50000 points
-    const POINTS_COUNT = 30000;
+    // Create geometry with 20000 points
+    const POINTS_COUNT = 20000;
     const positions = new Float32Array(POINTS_COUNT * 3);
     const colors = new Float32Array(POINTS_COUNT * 3);
     const sizes = new Float32Array(POINTS_COUNT);
