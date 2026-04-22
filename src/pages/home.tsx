@@ -116,14 +116,14 @@ const Home = () => {
 
   const organizerCards = [
     {
-      imageSrc: "src/assets/logo.png",      // replace with actual logo
+      imageSrc: "/yuni-logo.png",      // replace with actual logo
       title: "Yuni",
       buttonText: "Learn More",
       buttonLink: "#",
       variant: "green" as const,
     },
     {
-      imageSrc: "/logos/stellar-logo.png",  // replace with actual logo
+      imageSrc: "/stellar-logo.png",  // replace with actual logo
       title: "Stellar",
       buttonText: "View Events",
       buttonLink: "#",
