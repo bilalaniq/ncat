@@ -15,7 +15,7 @@ export interface TiltCardProps {
 
 interface TiltCardGroupProps {
   cards: TiltCardProps[];
-  showThemeToggle?: boolean;
+  // showThemeToggle prop removed – no longer needed
 }
 
 // ===== Single Card Component =====
@@ -163,21 +163,8 @@ const TiltCard: React.FC<TiltCardProps & { isMobile?: boolean }> = ({
 };
 
 // ===== Group Container =====
-const TiltCardGroup: React.FC<TiltCardGroupProps> = ({
-  cards,
-  showThemeToggle = true,
-}) => {
-  const [isLight, setIsLight] = useState(false);
+const TiltCardGroup: React.FC<TiltCardGroupProps> = ({ cards }) => {
   const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    if (isLight) {
-      html.classList.add("light");
-    } else {
-      html.classList.remove("light");
-    }
-  }, [isLight]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -197,13 +184,6 @@ const TiltCardGroup: React.FC<TiltCardGroupProps> = ({
           --box-bg: #232323;
           --name-color: #f8f8f8;
           --card-bg-text: #ffffff;
-        }
-
-        .light:root {
-          --main-bg: #f8f8f8;
-          --box-bg: #ffffff;
-          --name-color: #232323;
-          --card-bg-text: #343434;
         }
 
         .preserve-3d {
@@ -239,7 +219,6 @@ const TiltCardGroup: React.FC<TiltCardGroupProps> = ({
         }
       `}</style>
 
-    
       {/* Responsive container */}
       <div className="flex justify-center items-center">
         <div className="relative flex justify-center items-center flex-wrap w-full max-w-[1200px] preserve-3d px-4">

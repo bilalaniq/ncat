@@ -120,14 +120,14 @@ const Home = () => {
       title: "Yuni",
       buttonText: "Learn More",
       buttonLink: "#",
-      variant: "green" as const,            // ✅ green
+      variant: "green" as const,
     },
     {
       imageSrc: "/logos/stellar-logo.png",  // replace with actual logo
       title: "Stellar",
       buttonText: "View Events",
       buttonLink: "#",
-      variant: "orange" as const,           // ✅ light orange
+      variant: "orange" as const,
     },
   ];
 
@@ -169,8 +169,8 @@ const Home = () => {
           </h2>
         </div>
 
-        <div className="mb-20"> {/* Adjust mb-20 to desired spacing */}
-          <TiltCardGroup cards={organizerCards} showThemeToggle={true} />
+        <div className="mb-20">
+          <TiltCardGroup cards={organizerCards} /> {/* ✅ Removed showThemeToggle */}
         </div>
 
         <div className="text-center mb-10">
@@ -194,8 +194,6 @@ const Home = () => {
         </div>
 
         <GallerySection2 />
-
-
 
         <div className="text-center mt-50 mb-10">
           <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
@@ -221,7 +219,6 @@ const Home = () => {
         <div className="max-w-6xl mx-auto px-4 mb-40">
           <TeamMembers />
         </div>
-
 
         <div className="text-center mb-10">
           <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
