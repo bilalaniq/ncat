@@ -2,7 +2,7 @@
 import { lazy, Suspense } from "react";
 import HeroSection from "@/components/hero-section";
 import Footer from "@/components/footer";
-import TiltCardGroup from "@/components/TiltCardGroup"; // ✅ Correct import
+import TiltCardGroup from "@/components/TiltCardGroup";
 import Slider from "@/components/Slider";
 import GallerySection1 from "@/components/ImageGrid1";
 import GallerySection2 from "@/components/ImageGrid2";
@@ -114,20 +114,25 @@ const Home = () => {
     },
   ];
 
+  // Updated organizer cards with custom background text
   const organizerCards = [
     {
-      imageSrc: "/yuni-logo.png",      // replace with actual logo
+      imageSrc: "/yuni-logo.png",
       title: "Yuni",
       buttonText: "Learn More",
       buttonLink: "#",
       variant: "green" as const,
+      bgTextTop: "YUNI",
+      bgTextBottom: "TECH",
     },
     {
-      imageSrc: "/stellar-logo.png",  // replace with actual logo
+      imageSrc: "/stellar-logo.png",
       title: "Stellar",
       buttonText: "View Events",
       buttonLink: "#",
       variant: "orange" as const,
+      bgTextTop: "STELLAR",
+      bgTextBottom: "EVENTS",
     },
   ];
 
@@ -136,7 +141,7 @@ const Home = () => {
       {/* Hero section with particles */}
       <section
         id="Hero"
-        className="relative h-screen w-full overflow-hidden scroll-mt-20 md:scroll-mt-24"
+        className="relative h-screen w-full overflow-hidden scroll-mt-24"
       >
         <Suspense fallback={null}>
           <ParticleField />
@@ -160,7 +165,7 @@ const Home = () => {
       </section>
 
       {/* Main content */}
-      <div className="relative z-10 bg-black">
+      <div className="relative z-10 bg-black pt-20 scroll-mt-24" id="About">
         <HeroSection />
 
         <div className="text-center mb-10">
@@ -195,7 +200,12 @@ const Home = () => {
 
         <GallerySection2 />
 
-        <div className="text-center mt-50 mb-10">
+        <hr style={{ border: 'none', height: '2px', backgroundColor: '#44008b', margin: '0rem 0' }} />
+      </div>
+
+      {/* Agenda Section */}
+      <div id="Agenda" className="scroll-mt-24">
+        <div className="text-center mb-10 pt-30">
           <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
             Event Agenda
           </h2>
@@ -204,43 +214,46 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Enhanced Staircase Hover List for Agenda */}
         <div className="max-w-5xl mx-auto px-4 mb-20">
           <StaircaseHoverList items={agendaItems} title="" />
         </div>
 
-        <div className="text-center mb-10 mt-50">
+        <hr style={{ border: 'none', height: '2px', backgroundColor: '#44008b', margin: '0rem 0' }} />
+      </div>
+
+      {/* Team Section */}
+      <div id="Team" className="scroll-mt-24">
+        <div className="text-center mb-10 pt-35">
           <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
             Organizing Team
           </h2>
         </div>
 
-        {/* Team Members component */}
         <div className="max-w-6xl mx-auto px-4 mb-40">
           <TeamMembers />
         </div>
-
-        <div className="text-center mb-10">
-          <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
-            Our Partners
-          </h2>
-          <p className="text-white/80 mt-2 drop-shadow-sm">
-            Learn from industry-leading experts
-          </p>
-        </div>
-
-        <Slider
-          images={logoImages.slice(0, 9)}
-          width={230}
-          height={230}
-          reverse={true}
-          quantity={9}
-        />
-
-        <TextEffect />
-
-        <Footer />
       </div>
+
+      {/* Partners Section (no id, not in navbar) */}
+      <div className="text-center mb-10">
+        <h2 className="text-[#f0abfc] text-3xl md:text-4xl font-bold drop-shadow-md">
+          Our Partners
+        </h2>
+        <p className="text-white/80 mt-2 drop-shadow-sm">
+          Learn from industry-leading experts
+        </p>
+      </div>
+
+      <Slider
+        images={logoImages.slice(0, 9)}
+        width={230}
+        height={230}
+        reverse={true}
+        quantity={9}
+      />
+
+      <TextEffect />
+      <Footer />
     </div>
   );
 };

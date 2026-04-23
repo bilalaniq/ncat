@@ -10,6 +10,9 @@ export interface TiltCardProps {
   buttonLink?: string;
   variant?: "green" | "blue" | "red" | "orange";
   className?: string;
+  // New: customizable background text for each card
+  bgTextTop?: string;    // default: "NIKE"
+  bgTextBottom?: string; // default: "SHOES"
 }
 
 interface TiltCardGroupProps {
@@ -26,6 +29,8 @@ const TiltCard: React.FC<TiltCardProps & { isMobile?: boolean }> = ({
   variant = "green",
   className = "",
   isMobile = false,
+  bgTextTop = "NIKE",      // default value
+  bgTextBottom = "SHOES",  // default value
 }) => {
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -97,14 +102,14 @@ const TiltCard: React.FC<TiltCardProps & { isMobile?: boolean }> = ({
         ...mobileStyles,
       }}
     >
-      {/* Background "NIKE" text */}
+      {/* Background text - top (customizable) */}
       <div className="absolute top-5 left-5 text-[6em] font-black italic opacity-0 transition-opacity duration-500 text-[var(--card-bg-text)] group-hover:opacity-[0.04] pointer-events-none">
-        NIKE
+        {bgTextTop}
       </div>
 
-      {/* Background "SHOES" text */}
+      {/* Background text - bottom (customizable) */}
       <div className="absolute bottom-5 right-5 text-[4.5em] font-black italic opacity-0 transition-opacity duration-500 text-[var(--card-bg-text)] group-hover:opacity-[0.04] pointer-events-none">
-        SHOES
+        {bgTextBottom}
       </div>
 
       {/* Title */}
@@ -257,4 +262,4 @@ const TiltCardGroup: React.FC<TiltCardGroupProps> = ({ cards }) => {
   );
 };
 
-export default TiltCardGroup; 
+export default TiltCardGroup;

@@ -10,12 +10,26 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 
 // ----------------------------------------------------------------------
-// FIXED COLOR PALETTE (only the 5 specified colors)
+// FIXED COLOR PALETTE
 // ----------------------------------------------------------------------
 const FIXED_PALETTE = ["#05070f", "#1b1035", "#3b1d6b", "#7c3aed", "#f0abfc"];
 
 // ----------------------------------------------------------------------
-// SHADERS (unchanged from original)
+// MOBILE DETECTION & OPTIMIZATION FLAGS
+// ----------------------------------------------------------------------
+const isMobile = (() => {
+  const ua = navigator.userAgent || '';
+  return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|Windows Phone/i.test(ua) ||
+         window.innerWidth < 768;
+})();
+
+const PARTICLE_COUNT = isMobile ? 5000 : 20000;
+const PIXEL_RATIO = isMobile ? 1 : Math.min(window.devicePixelRatio, 2);
+const USE_POST_PROCESSING = !isMobile; // disable bloom/zoom on mobile
+const POINT_SIZE_RANGE = isMobile ? [3, 12] : [5, 20];
+
+// ----------------------------------------------------------------------
+// SHADERS
 // ----------------------------------------------------------------------
 const vertexShader = `
   uniform float uTime;
@@ -41,7 +55,7 @@ const fragmentShader = `
 `;
 
 // ----------------------------------------------------------------------
-// ZOOM BLUR PASS (identical to TroisJS implementation)
+// ZOOM BLUR PASS (unchanged, only used when post-processing is enabled)
 // ----------------------------------------------------------------------
 class ZoomBlurPass extends ShaderPass {
   declare uniforms: {
@@ -87,7 +101,7 @@ class ZoomBlurPass extends ShaderPass {
           gl_FragColor = color / total;
         }
       `,
-    } as any); // 'as any' avoids constructor type mismatch
+    } as any);
   }
 
   get strength() {
@@ -114,9 +128,9 @@ const ParticleField: React.FC = () => {
   const timeCoefRef = useRef<number>(1);
   const targetTimeCoefRef = useRef<number>(1);
   const pointerPosRef = useRef<THREE.Vector2>(new THREE.Vector2(0, 0));
-  const animationFrameRef = useRef<number>(0); // Fixed: initial value 0
+  const animationFrameRef = useRef<number>(0);
 
-  // Function to randomize colors (now only using the fixed palette)
+  // Function to randomize colors (fixed palette)
   const randomizeColors = () => {
     if (!pointsRef.current) return;
     const geometry = pointsRef.current.geometry;
@@ -129,21 +143,20 @@ const ParticleField: React.FC = () => {
     colorAttr.needsUpdate = true;
   };
 
-  // Function to set speed (exposed globally)
   const setSpeed = (fast: boolean) => {
     targetTimeCoefRef.current = fast ? 100 : 1;
   };
 
   useEffect(() => {
-    // Expose global controls for the home page button
+    // Expose global controls
     (window as any).__updateParticleColors = randomizeColors;
     (window as any).__setParticleSpeed = setSpeed;
 
     if (!containerRef.current) return;
 
-    // Renderer with solid black background
+    // Renderer with optimized pixel ratio
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(PIXEL_RATIO);
     renderer.setSize(window.innerWidth, window.innerHeight);
     containerRef.current.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -156,26 +169,24 @@ const ParticleField: React.FC = () => {
     camera.position.set(0, 0, 0);
     cameraRef.current = camera;
 
-    // Create geometry with 20000 points
-    const POINTS_COUNT = 20000;
-    const positions = new Float32Array(POINTS_COUNT * 3);
-    const colors = new Float32Array(POINTS_COUNT * 3);
-    const sizes = new Float32Array(POINTS_COUNT);
+    // Create geometry with mobile‑optimized count
+    const positions = new Float32Array(PARTICLE_COUNT * 3);
+    const colors = new Float32Array(PARTICLE_COUNT * 3);
+    const sizes = new Float32Array(PARTICLE_COUNT);
 
     const v3 = new THREE.Vector3();
     const color = new THREE.Color();
 
-    for (let i = 0; i < POINTS_COUNT; i++) {
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
       v3.set(
         THREE.MathUtils.randFloatSpread(200),
         THREE.MathUtils.randFloatSpread(200),
         THREE.MathUtils.randFloatSpread(300)
       );
       v3.toArray(positions, i * 3);
-      // Use only the fixed palette
       color.set(FIXED_PALETTE[Math.floor(THREE.MathUtils.randFloat(0, FIXED_PALETTE.length))]);
       color.toArray(colors, i * 3);
-      sizes[i] = THREE.MathUtils.randFloat(5, 20);
+      sizes[i] = THREE.MathUtils.randFloat(POINT_SIZE_RANGE[0], POINT_SIZE_RANGE[1]);
     }
 
     const geometry = new THREE.BufferGeometry();
@@ -210,23 +221,28 @@ const ParticleField: React.FC = () => {
     scene.add(points);
     pointsRef.current = points;
 
-    // Post-processing
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
+    // Post‑processing setup (conditionally enabled)
+    let composer: EffectComposer | null = null;
+    let zoomBlurPass: ZoomBlurPass | null = null;
 
-    const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2, 0, 0);
-    bloomPass.threshold = 0;
-    bloomPass.strength = 2;
-    bloomPass.radius = 0;
-    composer.addPass(bloomPass);
+    if (USE_POST_PROCESSING) {
+      composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
 
-    const zoomBlurPass = new ZoomBlurPass(0);
-    composer.addPass(zoomBlurPass);
-    zoomBlurPassRef.current = zoomBlurPass;
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 2, 0, 0);
+      bloomPass.threshold = 0;
+      bloomPass.strength = 2;
+      bloomPass.radius = 0;
+      composer.addPass(bloomPass);
+
+      zoomBlurPass = new ZoomBlurPass(0);
+      composer.addPass(zoomBlurPass);
+    }
 
     composerRef.current = composer;
+    zoomBlurPassRef.current = zoomBlurPass;
 
-    // Pointer move (for tilt)
+    // Pointer move (tilt)
     const handlePointerMove = (e: PointerEvent) => {
       pointerPosRef.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointerPosRef.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -240,7 +256,7 @@ const ParticleField: React.FC = () => {
       renderer.setSize(width, height);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      composer.setSize(width, height);
+      if (composer) composer.setSize(width, height);
     };
     window.addEventListener('resize', handleResize);
 
@@ -250,7 +266,7 @@ const ParticleField: React.FC = () => {
       timeCoefRef.current = THREE.MathUtils.lerp(timeCoefRef.current, targetTimeCoefRef.current, 0.02);
       uniformsRef.current.uTime.value += delta * timeCoefRef.current * 4;
 
-      if (zoomBlurPassRef.current) {
+      if (USE_POST_PROCESSING && zoomBlurPassRef.current) {
         zoomBlurPassRef.current.strength = timeCoefRef.current * 0.004;
       }
 
@@ -269,7 +285,12 @@ const ParticleField: React.FC = () => {
         pointsRef.current.rotation.set(tiltX, tiltY, 0);
       }
 
-      composerRef.current?.render();
+      if (composerRef.current) {
+        composerRef.current.render();
+      } else {
+        renderer.render(scene, camera);
+      }
+
       animationFrameRef.current = requestAnimationFrame(animate);
     };
     animate();
@@ -292,7 +313,7 @@ const ParticleField: React.FC = () => {
       ref={containerRef}
       style={{
         position: 'absolute',
-        top: 0,          // was -100
+        top: 0,
         left: 0,
         width: '100%',
         height: '100%',

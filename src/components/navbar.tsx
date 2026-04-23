@@ -2,15 +2,17 @@ import { TubeLightNavBar } from "./ui/tubelight-navbar";
 import { House, BriefcaseBusiness, FolderGit2, Star } from "lucide-react";
 
 const firstName = "Bilal";
+
+// Remove 'id' – TubeLightNavBar only needs name, url, icon
 const NavLinks = [
-  { id: 1, name: "Home", url: "/#Hero", icon: House },
-  { id: 2, name: "Experience", url: "/#Experience", icon: BriefcaseBusiness },
-  { id: 3, name: "Work", url: "/#Work", icon: FolderGit2 },
-  { id: 4, name: "Reviews", url: "/#Testimonials", icon: Star },
+  { name: "Hero", url: "/#Hero", icon: House },
+  { name: "About", url: "/#About", icon: BriefcaseBusiness },
+  { name: "Event Agenda", url: "/#Agenda", icon: FolderGit2 },
+  { name: "Team", url: "/#Team", icon: Star },
 ];
 
 const Navbar = () => {
-  return <TubeLightNavBar items={NavLinks} firstName={firstName} />
-}
+  return <TubeLightNavBar items={NavLinks} firstName={firstName} />;
+};
 
 export default Navbar;
