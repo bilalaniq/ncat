@@ -3,12 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Link } from "react-router";
 import { cn } from "@/lib/utils";
-import Photo from "../../assets/img/myProfilePhoto.jpeg";
 import { ArrowUpIcon } from "./arrow-icon";
 import { Menu, X } from "lucide-react";
-
-const fullName = "bilalaniq";
-const profilePhoto = Photo;
 
 interface NavItem {
   name: string;
@@ -22,7 +18,7 @@ interface NavBarProps {
   firstName: string;
 }
 
-export function TubeLightNavBar({ items, className, firstName }: NavBarProps) {
+export function TubeLightNavBar({ items, className }: NavBarProps) {
   const [activeTab, setActiveTab] = useState(items[0].name);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -82,17 +78,27 @@ export function TubeLightNavBar({ items, className, firstName }: NavBarProps) {
           className="flex items-center gap-3 border backdrop-blur-sm py-2.5 px-3.5 rounded-full shadow-lg"
           style={{ borderColor: colors.pink, backgroundColor: "rgba(0, 7, 111, 0.3)" }}
         >
-          <a href="/#Hero" onClick={(e) => {
-            e.preventDefault();
-            const hero = document.getElementById("Hero");
-            if (hero) {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-              window.history.pushState(null, "", "/#Hero");
-              setActiveTab("Hero");
-            }
-          }} className="flex items-center gap-2 mr-14">
-            <img className="w-11 aspect-square object-cover object-[center_9%] rounded-full mt-1 border-2" style={{ borderColor: colors.lightPink }} src={profilePhoto} alt={`${fullName} Profile Photo`} />
-            <p className="font-myNameFont text-xl" style={{ color: colors.lightPink }}>{firstName}</p>
+          <a
+            href="/#Hero"
+            onClick={(e) => {
+              e.preventDefault();
+              const hero = document.getElementById("Hero");
+              if (hero) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.history.pushState(null, "", "/#Hero");
+                setActiveTab("Hero");
+              }
+            }}
+            className="flex items-center gap-2 mr-14 group"
+          >
+            <div className="relative -my-4">
+              <img
+                className="w-32 h-32 relative z-10 transition-transform duration-300 group-hover:scale-105 -mt-8 -mb-8"
+                style={{ borderColor: colors.lightPink }}
+                src="/NCAT.png"
+                alt="Logo"
+              />
+            </div>
           </a>
 
           {items.map((item) => {
@@ -127,24 +133,45 @@ export function TubeLightNavBar({ items, className, firstName }: NavBarProps) {
         </div>
       </div>
 
-      {/* MOBILE NAVIGATION - similar click handler */}
+      {/* MOBILE NAVIGATION - with NCAT text */}
       <div className={cn("block lg:hidden fixed z-[50] top-0 left-4 right-4 md:left-20 md:right-20 md:pt-8 pt-4 w-auto", className)}>
         <div className="w-full flex justify-between items-center gap-3 border backdrop-blur-sm py-2.5 px-3.5 rounded-full shadow-lg" style={{ borderColor: colors.pink, backgroundColor: "rgba(0, 7, 111, 0.3)" }}>
-          <a href="/#Hero" onClick={(e) => {
-            e.preventDefault();
-            const hero = document.getElementById("Hero");
-            if (hero) {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-              window.history.pushState(null, "", "/#Hero");
-              setActiveTab("Hero");
-              setIsMenuOpen(false);
-            }
-          }} className="flex items-center gap-2 flex-1">
-            <img className="w-10 md:w-12 aspect-square object-cover object-[center_30%] rounded-full border-2 flex-shrink-0" style={{ borderColor: colors.lightPink }} src={profilePhoto} alt={`${fullName} Profile Photo`} />
-            <p className="font-myNameFont text-lg md:text-xl truncate" style={{ color: colors.lightPink }}>{firstName}</p>
+          <a
+            href="/#Hero"
+            onClick={(e) => {
+              e.preventDefault();
+              const hero = document.getElementById("Hero");
+              if (hero) {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                window.history.pushState(null, "", "/#Hero");
+                setActiveTab("Hero");
+                setIsMenuOpen(false);
+              }
+            }}
+            className="flex items-center gap-2 group"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity duration-300"
+                style={{ backgroundColor: colors.pink }} />
+              <img
+                className="w-12 md:w-14 h-12 md:h-14 object-contain rounded-full border-2 flex-shrink-0 transition-transform duration-300 group-hover:scale-105"
+                style={{ borderColor: colors.lightPink }}
+                src="/NCAT.png"
+                alt="Logo"
+              />
+            </div>
           </a>
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="px-2 py-2 rounded-full flex-shrink-0" style={{ backgroundColor: colors.magenta }} aria-label="Toggle menu">
-            {isMenuOpen ? <X size={22} className="text-white" /> : <Menu size={22} className="text-white" />}
+
+          {/* NCAT text in the middle */}
+          <span
+            className="text-white font-myMainFont font-semibold text-lg md:text-xl tracking-wide absolute left-1/2 transform -translate-x-1/2"
+            style={{ textShadow: `0 0 10px ${colors.pink}` }}
+          >
+            NCAT
+          </span>
+
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="px-3 py-3 rounded-full flex-shrink-0 transition-transform hover:scale-105" style={{ backgroundColor: colors.magenta }} aria-label="Toggle menu">
+            {isMenuOpen ? <X size={24} className="text-white" /> : <Menu size={24} className="text-white" />}
           </button>
         </div>
 
